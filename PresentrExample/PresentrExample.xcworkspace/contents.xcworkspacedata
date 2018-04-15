@@ -2,9 +2,9 @@
 <Workspace
    version = "1.0">
    <FileRef
-      location = "container:Presentr.xcodeproj">
+      location = "group:PresentrExample.xcodeproj">
    </FileRef>
    <FileRef
-      location = "group:PresentrExample/PresentrExample.xcodeproj">
+      location = "group:Pods/Pods.xcodeproj">
    </FileRef>
 </Workspace>
