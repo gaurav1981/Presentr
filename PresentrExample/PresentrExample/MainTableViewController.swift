@@ -33,7 +33,7 @@ enum ExampleSection {
         case .bottomHalf:
             return [.bottomHalfDefault, .bottomHalfCustom]
         case .other:
-            return [.backgroundBlur, .customBackground, .keyboardTest, .fullScreen]
+            return [.backgroundBlur, .customBackground, .keyboardTest, .fullScreen, .fullScreenFlip]
         case .advanced:
             return [.custom, .customAnimation, .modifiedAnimation, .coverVerticalWithSpring, .dynamicSize, .currentContext]
         }
@@ -56,7 +56,8 @@ enum ExampleItem: String {
     case bottomHalfDefault = "BottomHalf with default animation"
     case bottomHalfCustom = "BottomHalf with custom animation"
 
-    case fullScreen = "Full Screen"
+    case fullScreen = "Full Screen with default animation"
+    case fullScreenFlip = "Full Screen with flip animation"
     case customBackground = "Custom background"
     case keyboardTest = "Keyboard translation"
     case backgroundBlur = "Background blur"
@@ -94,6 +95,8 @@ enum ExampleItem: String {
 
         case .fullScreen:
             return #selector(MainTableViewController.fullScreenPresentation)
+        case .fullScreenFlip:
+            return #selector(MainTableViewController.fullScreenPresentationFlip)
         case .backgroundBlur:
             return #selector(MainTableViewController.backgroundBlurTest)
         case .keyboardTest:
@@ -149,6 +152,22 @@ class MainTableViewController: UITableViewController {
         customPresenter.dismissOnSwipe = true
         return customPresenter
     }()
+
+	let customOrientationPresenter: Presentr = {
+		let width = ModalSize.customOrientation(sizePortrait: 200, sizeLandscape: 300)
+		let height = ModalSize.customOrientation(sizePortrait: 150, sizeLandscape: 150)
+		let center = ModalCenterPosition.center
+		let customType = PresentationType.custom(width: width, height: height, center: center)
+
+		let customPresenter = Presentr(presentationType: customType)
+		customPresenter.transitionType = .coverVerticalFromTop
+		customPresenter.dismissTransitionType = .crossDissolve
+		customPresenter.roundCorners = false
+		customPresenter.backgroundColor = .green
+		customPresenter.backgroundOpacity = 0.5
+		customPresenter.dismissOnSwipe = true
+		return customPresenter
+	}()
 
     let customBackgroundPresenter: Presentr = {
         let width = ModalSize.full
@@ -260,8 +279,15 @@ extension MainTableViewController {
 
     @objc func alertCustom() {
         presenter.presentationType = .alert
-        presenter.transitionType = .coverHorizontalFromLeft
-        presenter.dismissTransitionType = .coverHorizontalFromRight
+
+		presenter.transitionType = .coverFromCorner(.topLeft)
+		presenter.dismissTransitionType = .coverFromCorner(.bottomRight)
+
+//		presenter.transitionType = .flipHorizontal
+//		presenter.dismissTransitionType = .flipHorizontal
+
+//        presenter.transitionType = .coverHorizontalFromLeft
+//        presenter.dismissTransitionType = .coverHorizontalFromRight
         presenter.dismissAnimated = true
         customPresentViewController(presenter, viewController: alertController, animated: true)
     }
@@ -335,6 +361,13 @@ extension MainTableViewController {
         customPresentViewController(presenter, viewController: alertController, animated: true)
     }
 
+    @objc func fullScreenPresentationFlip() {
+        presenter.presentationType = .fullScreen
+        presenter.transitionType = .flipHorizontal
+        presenter.dismissTransitionType = .flipHorizontal
+        customPresentViewController(presenter, viewController: alertController, animated: true, completion: nil)
+    }
+
     @objc func customBackgroundPresentation() {
         customPresentViewController(customBackgroundPresenter, viewController: alertController, animated: true)
     }
@@ -358,7 +391,7 @@ extension MainTableViewController {
     // MARK: Advanced
 
     @objc func customPresentation() {
-        customPresentViewController(customPresenter, viewController: alertController, animated: true)
+        customPresentViewController(customOrientationPresenter, viewController: alertController, animated: true)
     }
 
     @objc func customAnimation() {
